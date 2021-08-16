@@ -1,18 +1,16 @@
 #ifndef DISPLACEMENT_H
 #define DISPLACEMENT_H
 
-#include "Coordinate.h"
-#include "cmath"
+#include "Restrain.h"
 #include "iostream"
+#include "vector"
 
 using namespace std;
 
-double CalDistance(double posX1, double posY1, double posX2, double posY2);
-double BlueDroneDistance(Coordinate::_BluePlane _blueplane,
-                         Coordinate::_Drone _drone);
-double RedDroneDistance(Coordinate::_RedPlane _redplane,
-                        Coordinate::_Drone _drone);
-double BlueRedDistance(Coordinate::_BluePlane _blueplane,
-                       Coordinate::_RedPlane _redplane);
+void BlueDisplacement(Coordinate::_BluePlane blueplane, double posX,
+                      double posY);
+void RedDisplacement(Coordinate::_RedPlane redplane, double posX, double posY);
+
+void DroneDisplacement(Coordinate::_Drone drone, double posX, double posY);
 
 #endif

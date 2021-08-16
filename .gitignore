@@ -1,1 +1,5 @@
 /out
+/.idea
+/cmake-build-debug
+.fake
+.ionide
