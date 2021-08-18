@@ -97,9 +97,17 @@ UniVector TwoPoint2UniVector(double posX1, double posY1, double posX2,
   return univector;
 }
 
-UniVector VerticalVector2Point(UniVector previousVector, double currentPosX,
-                               double currentPosY, double destinationPosX,
-                               double destinationPosY) {
+UniVector Norm2UniVector(NormVector normVector) {
+  UniVector uniVector;
+  double length = CalDistance(0, 0, normVector.VectorX, normVector.VectorY);
+  uniVector.unitVectorX = normVector.VectorX / length;
+  uniVector.unitVectorY = normVector.VectorY / length;
+  return uniVector;
+}
+
+UniVector VerticalUniVector(UniVector previousVector, double currentPosX,
+                            double currentPosY, double destinationPosX,
+                            double destinationPosY) {
   UniVector verticalUniVector;
   if (previousVector.unitVectorX == 0 && previousVector.unitVectorY == 0) {
     double length =
@@ -108,7 +116,61 @@ UniVector VerticalVector2Point(UniVector previousVector, double currentPosX,
     verticalUniVector.unitVectorY = (destinationPosY - currentPosY) / length;
     return verticalUniVector;
   } else if (previousVector.unitVectorX == 0) {
-    // TODO
+    if (destinationPosX - currentPosX >= 0) {
+      verticalUniVector.unitVectorX = 1;
+      verticalUniVector.unitVectorY = 0;
+    } else if (destinationPosX - currentPosX < 0) {
+      verticalUniVector.unitVectorX = -1;
+      verticalUniVector.unitVectorY = 0;
+    }
+  } else if (previousVector.unitVectorY == 0) {
+    if (destinationPosY - currentPosY >= 0) {
+      verticalUniVector.unitVectorX = 0;
+      verticalUniVector.unitVectorY = 1;
+    } else if (destinationPosY - currentPosY < 0) {
+      verticalUniVector.unitVectorX = 0;
+      verticalUniVector.unitVectorY = -1;
+    }
+  } else {
+    if (destinationPosX - currentPosX >= 0) {
+      UniVector tempVector = {
+          tempVector.unitVectorX = abs(1 / previousVector.unitVectorX),
+          tempVector.unitVectorY = -abs(1 / previousVector.unitVectorY),
+      };
+      double length =
+          CalDistance(0, 0, tempVector.unitVectorX, tempVector.unitVectorY);
+      verticalUniVector.unitVectorX = tempVector.unitVectorX / length;
+      verticalUniVector.unitVectorY = tempVector.unitVectorY / length;
+    } else if (destinationPosX - currentPosX < 0) {
+      UniVector tempVector = {
+          tempVector.unitVectorX = -abs(1 / previousVector.unitVectorX),
+          tempVector.unitVectorY = abs(1 / previousVector.unitVectorY),
+      };
+      double length =
+          CalDistance(0, 0, tempVector.unitVectorX, tempVector.unitVectorY);
+      verticalUniVector.unitVectorX = tempVector.unitVectorX / length;
+      verticalUniVector.unitVectorY = tempVector.unitVectorY / length;
+    }
   }
   return verticalUniVector;
+}
+
+CircleCenter GetCircleCenter(UniVector previousVector, double currentPosX,
+                             double currentPosY, double destinationPosX,
+                             double destinationPosY, double radious) {
+  CircleCenter circleCenter;
+  UniVector verticalUniVector =
+      VerticalUniVector(previousVector, currentPosX, currentPosY,
+                        destinationPosX, destinationPosY);
+  UniVector lengthVector = {
+      lengthVector.unitVectorX = verticalUniVector.unitVectorX * radious,
+      lengthVector.unitVectorY = verticalUniVector.unitVectorY * radious,
+  };
+  circleCenter.posX = currentPosX + lengthVector.unitVectorX;
+  circleCenter.posY = currentPosY + lengthVector.unitVectorY;
+  return circleCenter;
+}
+
+double GetSpinDegree(double radius, double velocity, double timer) {
+  return velocity * timer / radius;
 }

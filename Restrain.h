@@ -3,6 +3,7 @@
 
 #include "Coordinate.h"
 #include "Distance.h"
+#include "cstdlib"
 #include "iostream"
 #include "vector"
 
@@ -47,13 +48,48 @@ public:
   double unitVectorY;
 };
 
+// 普通向量
+struct NormVector {
+public:
+  double VectorX;
+  double VectorY;
+};
+
 // 两点获得单位向量
 UniVector TwoPoint2UniVector(double posX1, double posY1, double posX2,
                              double posY2);
 
-// 获得与指定向量向指定方向的垂直单位向量
-UniVector VerticalVector2Point(UniVector previousVector, double currentPosX,
-                               double currentPosY, double destinationPosX,
-                               double destinationPosY);
+// 普通向量转化单位向量
+UniVector Norm2UniVector(NormVector normVector);
 
+// 获得与指定向量向指定方向的垂直单位向量
+UniVector VerticalUniVector(UniVector previousVector, double currentPosX,
+                            double currentPosY, double destinationPosX,
+                            double destinationPosY);
+
+// 圆心
+struct CircleCenter {
+public:
+  double posX;
+  double posY;
+};
+
+// 获取切线圆的圆心
+CircleCenter GetCircleCenter(UniVector previousVector, double currentPosX,
+                             double currentPosY, double destinationPosX,
+                             double destinationPosY, double radious);
+
+// 获取在某长度时间内在某个半径圆上旋转角度（弧度）
+double GetSpinDegree(double radius, double velocity, double timer);
+
+// 某坐标点
+struct Position {
+public:
+  double posX;
+  double posY;
+};
+
+// 获取当前坐标点切线方向向量与x轴夹角
+
+// TODO
 #endif
