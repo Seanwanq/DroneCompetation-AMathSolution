@@ -3,9 +3,12 @@
 
 #include "Coordinate.h"
 #include "Distance.h"
+#include "cmath"
 #include "cstdlib"
 #include "iostream"
 #include "vector"
+
+#define PI 3.14159
 
 using namespace std;
 
@@ -89,7 +92,17 @@ public:
   double posY;
 };
 
-// 获取当前坐标点切线方向向量与x轴夹角
+// 获取当前坐标点切线方向向量与x轴夹角...单位向量版
+double GetTheta(UniVector uniVector);
+
+// 获取当前坐标点切线方向向量与x轴夹角...普通向量版
+double GetTheta(NormVector normVector);
+
+// 在进行转向时，判断下一个位置...返回Position类
+Position GetNextPositionWhenSwerve(Position currentPos,
+                                   UniVector currentUniVector, Position destPos,
+                                   double radius, double velocity,
+                                   double timerStep);
 
 // TODO
 #endif

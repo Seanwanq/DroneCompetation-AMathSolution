@@ -1,4 +1,6 @@
 #include "Restrain.h"
+#include <corecrt_math.h>
+#include <utility>
 
 double TimeRestrain(double timer) { return timer; }
 
@@ -173,4 +175,36 @@ CircleCenter GetCircleCenter(UniVector previousVector, double currentPosX,
 
 double GetSpinDegree(double radius, double velocity, double timer) {
   return velocity * timer / radius;
+}
+
+double GetTheta(UniVector uniVector) {
+  double angle;
+  if (uniVector.unitVectorX == 0 && uniVector.unitVectorY >= 0) {
+    return angle = PI / 2;
+  } else if (uniVector.unitVectorX == 0 && uniVector.unitVectorY < 0) {
+    return angle = -PI / 2;
+  }
+
+  if (uniVector.unitVectorX >= 0) {
+    angle = atan(uniVector.unitVectorY / uniVector.unitVectorX);
+  } else if (uniVector.unitVectorX < 0) {
+    angle = PI / 2 + atan(uniVector.unitVectorY / uniVector.unitVectorX);
+  }
+  return angle;
+}
+
+double GetTheta(NormVector normVector) {
+  UniVector uniVector = Norm2UniVector(normVector);
+  return GetTheta(uniVector);
+}
+
+Position GetNextPositionWhenSwerve(Position currentPos,
+                                   UniVector currentUniVector, Position destPos,
+                                   double radius, double velocity,
+                                   double timerStep) {
+  Position nextPosition;
+  // 获得步长∠
+  double tempAngle = GetSpinDegree(radius, velocity, timerStep);
+  // TODO
+  return nextPosition;
 }
