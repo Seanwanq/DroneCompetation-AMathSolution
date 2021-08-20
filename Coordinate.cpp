@@ -103,3 +103,7 @@ int Coordinate::BluePlaneQuan() { return _blueid; }
 int Coordinate::RedPlaneQuan() { return _redid; }
 
 int Coordinate::DroneQuan() { return _droneid; }
+
+double Coordinate::CoordinateHeight() { return _height; }
+
+double Coordinate::CoordinateWidth() { return _width; }

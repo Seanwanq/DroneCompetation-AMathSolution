@@ -9,8 +9,8 @@ using namespace std;
 // 该类用于设定坐标系，创建飞机，改变飞机参数，获取飞机参数
 class Coordinate {
 private:
-  double _height;
-  double _width;
+  static double _height;
+  static double _width;
 
   int _blueid;  // 蓝方飞机编号 从0开始
   int _redid;   // 红方飞机编号 从0开始
@@ -32,6 +32,7 @@ public:
   // 设置飞机位置 传入参数：XXX.type, XXX.id, x坐标, y坐标
   void SetPlanePos(string type, int id, double posX, double posY);
 
+  // TODO 初始化时需要设置单位向量
   class _BluePlane {
   public:
     int id;
@@ -71,6 +72,9 @@ public:
   int BluePlaneQuan();
   int RedPlaneQuan();
   int DroneQuan();
+
+  static double CoordinateHeight();
+  static double CoordinateWidth();
 };
 
 #endif

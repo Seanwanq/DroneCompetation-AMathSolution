@@ -8,7 +8,7 @@
 #include "iostream"
 #include "vector"
 
-#define PI 3.14159
+#define PI 3.1415926
 
 using namespace std;
 
@@ -70,11 +70,25 @@ UniVector VerticalUniVector(UniVector previousVector, double currentPosX,
                             double currentPosY, double destinationPosX,
                             double destinationPosY);
 
-// 圆心
-struct CircleCenter {
+// 某坐标点
+struct Position {
 public:
   double posX;
   double posY;
+};
+
+// 圆心
+struct CircleCenter : Position {
+public:
+  double posX;
+  double posY;
+};
+
+struct PositionAndVector : Position {
+public:
+  double posX;
+  double posY;
+  UniVector uniVector;
 };
 
 // 获取切线圆的圆心
@@ -85,24 +99,39 @@ CircleCenter GetCircleCenter(UniVector previousVector, double currentPosX,
 // 获取在某长度时间内在某个半径圆上旋转角度（弧度）
 double GetSpinDegree(double radius, double velocity, double timer);
 
-// 某坐标点
-struct Position {
-public:
-  double posX;
-  double posY;
-};
-
 // 获取当前坐标点切线方向向量与x轴夹角...单位向量版
 double GetTheta(UniVector uniVector);
 
 // 获取当前坐标点切线方向向量与x轴夹角...普通向量版
 double GetTheta(NormVector normVector);
 
-// 在进行转向时，判断下一个位置...返回Position类
+// 在进行转向时，判断下一个位置...返回Position类...单位向量版
 Position GetNextPositionWhenSwerve(Position currentPos,
                                    UniVector currentUniVector, Position destPos,
                                    double radius, double velocity,
                                    double timerStep);
 
+// 在进行转向时，判断下一个位置...返回Position类...普通向量版
+Position GetNextPositionWhenSwerve(Position currentPos,
+                                   NormVector currentNormVector,
+                                   Position destPos, double radius,
+                                   double velocity, double timerStep);
+
+// 走直线，判断下一个位置...返回Position类
+Position GetNextPositionWhenLine(Position currentPos, Position destPos,
+                                 double velocity, double timerStep);
+
+// 给定终点，自动判断在timerStep后的一个坐标点...返回Position类
+Position GetNextPosition(Position currentPos, UniVector currentUniVector,
+                         Position destPos, double radius, double velocity,
+                         double timerStep);
+
+// 针对y轴的冒泡排序
+vector<Position> posCountingSort(vector<Position> posVec);
 // TODO
+
+// 判断无人机是否间距小于300m，若小于返回处理后坐标，若不小于返回(-10, -10)
+Position IsDroneTooClose(Coordinate::_Drone drone,
+                         vector<Coordinate::_Drone> droneVec, double velocity,
+                         double timerStep);
 #endif

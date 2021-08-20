@@ -1,6 +1,7 @@
 #include "Restrain.h"
 #include <corecrt_math.h>
 #include <utility>
+#include <vector>
 
 double TimeRestrain(double timer) { return timer; }
 
@@ -203,8 +204,141 @@ Position GetNextPositionWhenSwerve(Position currentPos,
                                    double radius, double velocity,
                                    double timerStep) {
   Position nextPosition;
-  // 获得步长∠
+  // 获得步长角∠
   double tempAngle = GetSpinDegree(radius, velocity, timerStep);
-  // TODO
+  double theta = GetTheta(currentUniVector);
+  double nextThetaPlus, nextThetaMinus;
+
+  nextThetaPlus = theta + tempAngle;
+  nextThetaMinus = theta - tempAngle;
+
+  NormVector tempVectorPlus, tempVectorMinus;
+
+  tempVectorPlus.VectorX = cos(nextThetaPlus);
+  tempVectorPlus.VectorY = sin(nextThetaPlus);
+
+  tempVectorMinus.VectorX = cos(nextThetaMinus);
+  tempVectorMinus.VectorY = sin(nextThetaMinus);
+
+  Position tempPosPlus, tempPosMinus;
+
+  tempPosPlus.posX =
+      currentPos.posX + velocity * timerStep * tempVectorPlus.VectorX;
+  tempPosPlus.posY =
+      currentPos.posY + velocity * timerStep * tempVectorPlus.VectorY;
+
+  tempPosMinus.posX =
+      currentPos.posX + velocity * timerStep * tempVectorMinus.VectorX;
+  tempPosMinus.posY =
+      currentPos.posY + velocity * timerStep * tempVectorMinus.VectorY;
+
+  double distancePlus, distanceMinus;
+
+  distancePlus = CalDistance(tempPosPlus.posX, tempPosPlus.posY, destPos.posX,
+                             destPos.posY);
+
+  distanceMinus = CalDistance(tempPosMinus.posX, tempPosMinus.posY,
+                              destPos.posX, destPos.posY);
+
+  if (distancePlus <= distanceMinus) {
+    nextPosition = tempPosPlus;
+  } else {
+    nextPosition = tempPosMinus;
+  }
+
+  return nextPosition;
+}
+
+Position GetNextPositionWhenSwerve(Position currentPos,
+                                   NormVector currentNormVector,
+                                   Position destPos, double radius,
+                                   double velocity, double timerStep) {
+  UniVector currentUniVector = Norm2UniVector(currentNormVector);
+  return GetNextPositionWhenSwerve(currentPos, currentUniVector, destPos,
+                                   radius, velocity, timerStep);
+}
+
+Position GetNextPositionWhenLine(Position currentPos, Position destPos,
+                                 double velocity, double timerStep) {
+  Position nextPosition;
+  UniVector nextUniVector = TwoPoint2UniVector(currentPos.posX, currentPos.posY,
+                                               destPos.posX, destPos.posY);
+  nextPosition.posX =
+      currentPos.posX + velocity * timerStep * nextUniVector.unitVectorX;
+  nextPosition.posY =
+      currentPos.posY + velocity * timerStep * nextUniVector.unitVectorY;
+
+  return nextPosition;
+}
+
+Position GetNextPosition(Position currentPos, UniVector currentUniVector,
+                         Position destPos, double radius, double velocity,
+                         double timerStep) {
+  Position nextPosition;
+
+  UniVector current2DestUniVector = TwoPoint2UniVector(
+      currentPos.posX, currentPos.posY, destPos.posX, destPos.posY);
+
+  if (currentUniVector.unitVectorX == current2DestUniVector.unitVectorX &&
+      currentUniVector.unitVectorY == current2DestUniVector.unitVectorY) {
+    nextPosition =
+        GetNextPositionWhenLine(currentPos, destPos, velocity, timerStep);
+    return nextPosition;
+  }
+
+  nextPosition = GetNextPositionWhenSwerve(
+      currentPos, currentUniVector, destPos, radius, velocity, timerStep);
+
+  return nextPosition;
+}
+
+vector<Position> posCountingSort(vector<Position> posVec) {
+  int len = posVec.size();
+  for (int i = 0; i < len - 1; i++) {
+    for (int j = 0; j < len - 1 - i; j++) {
+      if (posVec[j].posY > posVec[j + 1].posY) { // 相邻元素两两对比
+        double temp = posVec[j + 1].posY;        // 元素交换
+        posVec[j + 1].posY = posVec[j].posY;
+        posVec[j].posY = temp;
+      }
+    }
+  }
+  return posVec;
+}
+
+Position IsDroneTooClose(Coordinate::_Drone drone,
+                         vector<Coordinate::_Drone> droneVec, double velocity,
+                         double timerStep) {
+  Position nextPosition = {
+      nextPosition.posX = 0,
+      nextPosition.posY = 0,
+  };
+
+  vector<double> distanceVec;
+
+  vector<Coordinate::_Drone>::iterator i;
+  for (i = droneVec.begin(); i != droneVec.end(); i++) {
+    if (drone.id == i->id) {
+      continue;
+    }
+    double distance = CalDistance(drone.posX, drone.posY, i->posX, i->posY);
+    if (distance < 0.3) {
+      distanceVec.push_back(distance);
+      UniVector uniVector =
+          TwoPoint2UniVector(drone.posX, drone.posY, i->posX, i->posY);
+      UniVector reversed = {
+          reversed.unitVectorX = -uniVector.unitVectorX,
+          reversed.unitVectorY = -uniVector.unitVectorY,
+      };
+      nextPosition.posX =
+          nextPosition.posX + reversed.unitVectorX * velocity * 0.5 * timerStep;
+      nextPosition.posY =
+          nextPosition.posY + reversed.unitVectorY * velocity * 0.5 * timerStep;
+    }
+  }
+
+  nextPosition.posX = nextPosition.posX / distanceVec.size() + drone.posX;
+  nextPosition.posY = nextPosition.posY / distanceVec.size() + drone.posY;
+
   return nextPosition;
 }
